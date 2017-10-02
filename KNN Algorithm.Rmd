@@ -26,3 +26,88 @@ plot(pressure)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+gc <- read.csv("germancredit.csv")
+head (gc)
+## Taking back-up of the input file, in case the original data is required later
+
+gc.bkup <- gc
+
+## Convert the dependent var to factor. Normalize the numeric variables  
+
+gc$Default <- factor(gc$Default)
+
+num.vars <- sapply(gc, is.numeric)
+gc[num.vars] <- lapply(gc[num.vars], scale)
+
+## Selecting only 3 numeric variables for this demostration, just to keep things simple
+
+myvars <- c("duration", "amount", "installment")
+gc.subset <- gc[myvars]
+
+summary(gc.subset)
+
+## Let's predict on a test set of 100 observations. Rest to be used as train set.
+
+set.seed(123) 
+test <- 1:100
+train.gc <- gc.subset[-test,]
+test.gc <- gc.subset[test,]
+
+train.def <- gc$Default[-test]
+test.def <- gc$Default[test]
+
+## Let's use k values (no of NNs) as 1, 5 and 20 to see how they perform in terms of correct proportion of classification and success rate. The optimum k value can be chosen based on the outcomes as below...
+
+library(class)
+
+knn.1 <-  knn(train.gc, test.gc, train.def, k=1)
+knn.5 <-  knn(train.gc, test.gc, train.def, k=5)
+knn.20 <- knn(train.gc, test.gc, train.def, k=20)
+
+## Let's calculate the proportion of correct classification for k = 1, 5 & 20 
+
+100 * sum(test.def == knn.1)/100  # For knn = 1
+
+
+100 * sum(test.def == knn.5)/100  # For knn = 5
+
+100 * sum(test.def == knn.20)/100 # For knn = 20
+
+## If we look at the above proportions, it's quite evident that K = 1 correctly classifies 68% of the outcomes, K = 5 correctly classifies 74% and K = 20 does it for 81% of the outcomes. 
+
+## We should also look at the success rate against the value of increasing K.
+
+table(knn.1 ,test.def)
+
+## For K = 1, among 65 customers, 54 or 83%, is success rate. Let's look at k = 5 now
+
+table(knn.5 ,test.def)
+
+## For K = 5, among 76 customers, 63 or 82%, is success rate.Let's look at K = 20 now
+
+table(knn.20 ,test.def)
+
+##For K = 20, among 88 customers, 71 or 80%, is success rate.
+
+## It seems increasing K increases the classification but reduces success rate. It is worse to class a customer as good when it is bad, than it is to class a customer as bad when it is good. 
+## By looking at above success rates, K = 1 or K = 5 can be taken as optimum K.
+## We can make a plot of the data with the training set in hollow shapes and the new ones filled in. 
+## Plot for K = 1 can be created as follows - 
+
+plot(train.gc[,c("amount","duration")],
+     col=c(4,3,6,2)[gc.bkup[-test, "installment"]],
+     pch=c(1,2)[as.numeric(train.def)],
+     main="Predicted Default, by 1 Nearest Neighbors",cex.main=.95)
+
+points(test.gc[,c("amount","duration")],
+       bg=c(4,3,6,2)[gc.bkup[-test,"installment"]],
+       pch=c(21,24)[as.numeric(knn.1)],cex=1.2,col=grey(.7))
+
+legend("bottomright",pch=c(1,16,2,17),bg=c(1,1,1,1),
+       legend=c("data 0","pred 0","data 1","pred 1"),
+       title="default",bty="n",cex=.8)
+
+legend("topleft",fill=c(4,3,6,2),legend=c(1,2,3,4),
+       title="installment %", horiz=TRUE,bty="n",col=grey(.7),cex=.8)
+
+## Plots are good way to represent data visually, but here it looks like an overkill as there are too many data on the plot.

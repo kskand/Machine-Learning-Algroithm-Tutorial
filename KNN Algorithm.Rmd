@@ -45,27 +45,10 @@ k nearest neighbors is a simple algorithm that stores all available cases and cl
 
 ### Case Study on kNN algorithm
 
-```{r}
+##### **Case Study -1**
 
-```
-
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-
-
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r eval=FALSE}
+getwd()
 gc <- read.csv("germancredit.csv")
 head (gc)
 ## Taking back-up of the input file, in case the original data is required later
@@ -87,7 +70,10 @@ gc.subset <- gc[myvars]
 summary(gc.subset)
 
 ## Let's predict on a test set of 100 observations. Rest to be used as train set.
+```
 
+
+```{r eval=FALSE}
 set.seed(123) 
 test <- 1:100
 train.gc <- gc.subset[-test,]
@@ -95,7 +81,6 @@ test.gc <- gc.subset[test,]
 
 train.def <- gc$Default[-test]
 test.def <- gc$Default[test]
-
 ## Let's use k values (no of NNs) as 1, 5 and 20 to see how they perform in terms of correct proportion of classification and success rate. The optimum k value can be chosen based on the outcomes as below...
 
 library(class)
@@ -151,3 +136,7 @@ legend("topleft",fill=c(4,3,6,2),legend=c(1,2,3,4),
        title="installment %", horiz=TRUE,bty="n",col=grey(.7),cex=.8)
 
 ## Plots are good way to represent data visually, but here it looks like an overkill as there are too many data on the plot.
+```
+
+
+

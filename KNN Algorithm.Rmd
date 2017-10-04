@@ -1,31 +1,49 @@
 ---
-title: "KNN(K-Nearest Neighbour) Algorithm"
+title: "kNN(k-Nearest Neighbour) Algorithm"
 author: "Kumar Skand"
 date: "October 2, 2017"
 output: html_document
 Refrence: Various study material available online.
 ---
 
-###What is K-NN ?
+###What is kNN ?
 Let's assume we have several groups of labeled samples. The items present in the groups are homogeneous in nature. Now, suppose we have an unlabeled example which needs to be classified into one of the several labeled groups. How do you do that? Unhesitatingly, using kNN Algorithm.
 
 k nearest neighbors is a simple algorithm that stores all available cases and classifies new cases by a majority vote of its k neighbors. This algorithms segregates unlabeled data points into well defined groups.
 
-####K-NN Algorithm features:
+####kNN Algorithm features:
 1. A very simple classification and regression algorithm.
       * In case of classification, new data points get classified in a particular class.
       * In case of regression, new data get labeled based on the avg. value of k nearest neighbour.
 
 2. It is a lazy learner because it doesn't learn much from the training data.
 3. It is supervised learning algorithm.
-4. Default method is Euclidean distance (shortest distance between 2 points, using formula = = .
+4. Default method is Euclidean distance (shortest distance between 2 points, using formula  = $\sqrt((X_1-X_2)^2+(Y_1-Y_2)^2)$ ) .
 
-####Requirements for K-NN
+####Requirements for kNN
 1. **Generally k gets decided on the square root of data points**.But a large k value has benefits which include reducing the variance due to the noisy data; the side effect being developing a bias due to which the learner tends to ignore the smaller patterns which may have useful insights
 2. **Data Normalization** - It is to transform all the feature data in the same scale (for eg: 0 to 1) else it will give more weitage to the data which is higher in value irrespective of scale/unit.
 3. Installation of "Class" library to implement in R.
 
+####kNN Algorithm - Pros and Cons
 
+**Pros**: The algorithm is highly unbiased in nature and makes no prior assumption of the underlying data. Being simple and effective in nature, it is easy to implement and has gained good popularity.
+
+**Cons**: Indeed it is simple but kNN algorithm has drawn a lot of flake for being extremely simple! If we take a deeper look, this doesn't create a model since there's no abstraction process involved. Yes, the training process is really fast as the data is stored verbatim (hence lazy learner) but the prediction time is pretty high with useful insights missing at times. Therefore, building this algorithm requires time to be invested in data preparation (especially treating the missing data and categorical features) to obtain a robust model.
+
+
+#### Steps Involved in performing kNN algorithm:
+1. Data Collection.
+2. Preparing and exploring the data.
+      * Understnding data structure.
+      * Data normalization.
+      * Creating Training and Test data set.
+3. Training a model on data.
+4. Evaluate the model performance.
+5. Improve the performance of model.
+
+
+### Case Study on kNN algorithm
 
 ```{r}
 

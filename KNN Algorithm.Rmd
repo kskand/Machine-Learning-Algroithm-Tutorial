@@ -3,7 +3,34 @@ title: "KNN(K-Nearest Neighbour) Algorithm"
 author: "Kumar Skand"
 date: "October 2, 2017"
 output: html_document
+Refrence: Various study material available online.
 ---
+
+###What is K-NN ?
+Let's assume we have several groups of labeled samples. The items present in the groups are homogeneous in nature. Now, suppose we have an unlabeled example which needs to be classified into one of the several labeled groups. How do you do that? Unhesitatingly, using kNN Algorithm.
+
+k nearest neighbors is a simple algorithm that stores all available cases and classifies new cases by a majority vote of its k neighbors. This algorithms segregates unlabeled data points into well defined groups.
+
+####K-NN Algorithm features:
+1. A very simple classification and regression algorithm.
+      * In case of classification, new data points get classified in a particular class.
+      * In case of regression, new data get labeled based on the avg. value of k nearest neighbour.
+
+2. It is a lazy learner because it doesn't learn much from the training data.
+3. It is supervised learning algorithm.
+4. Default method is Euclidean distance (shortest distance between 2 points, using formula = = .
+
+####Requirements for K-NN
+1. **Generally k gets decided on the square root of data points**.But a large k value has benefits which include reducing the variance due to the noisy data; the side effect being developing a bias due to which the learner tends to ignore the smaller patterns which may have useful insights
+2. **Data Normalization** - It is to transform all the feature data in the same scale (for eg: 0 to 1) else it will give more weitage to the data which is higher in value irrespective of scale/unit.
+3. Installation of "Class" library to implement in R.
+
+
+
+```{r}
+
+```
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -11,11 +38,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
 
 ## Including Plots
 

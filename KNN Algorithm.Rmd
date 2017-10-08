@@ -1,24 +1,38 @@
 ---
-title: "kNN(k-Nearest Neighbour) Algorithm"
+title : "kNN(k-Nearest Neighbour) Algorithm"
 author: "Kumar Skand"
-date: "October 2, 2017"
-output: html_document
-Refrence: Various study material available online.
+date  : "October 2, 2017"
+output:
+  html_document: default
 ---
+######*References:Various study material available online.*
 
 ###What is kNN ?
 Let's assume we have several groups of labeled samples. The items present in the groups are homogeneous in nature. Now, suppose we have an unlabeled example which needs to be classified into one of the several labeled groups. How do you do that? Unhesitatingly, using kNN Algorithm.
 
 k nearest neighbors is a simple algorithm that stores all available cases and classifies new cases by a majority vote of its k neighbors. This algorithms segregates unlabeled data points into well defined groups.
 
+###How does the KNN algorithm work?
+
+Let's take a simple case to understand this algorithm. Following is a spread of red circles (RC) and green squares (GS) :
+
+! (/E:/Personl/DATA SCIENTIST/Practice/Cousera_KS/Machine-Learning-Algroithm-Tutorial/knn0.png)
+
+You intend to find out the class of the blue star (BS) . BS can either be RC or GS and nothing else. The "K" is KNN algorithm is the nearest neighbors we wish to take vote from. Let's say K = 3. Hence, we will now make a circle with BS as center just as big as to enclose only three datapoints on the plane. Refer to following diagram for more details:
+
+Image
+
+The three closest points to BS is all RC. Hence, with good confidence level we can say that the BS should belong to the class RC. Here, the choice became very obvious as all three votes from the closest neighbor went to RC. The choice of the parameter K is very crucial in this algorithm. Next we will understand what are the factors to be considered to conclude the best K.
+
+
 ####kNN Algorithm features:
 1. A very simple classification and regression algorithm.
-      * In case of classification, new data points get classified in a particular class.
-      * In case of regression, new data get labeled based on the avg. value of k nearest neighbour.
+      * In case of classification, new data points get classified in a particular class on the basis of voting from nearest neighbors.
+      * In case of regression, new data get labeled based on the averages of nearest value.
 
 2. It is a lazy learner because it doesn't learn much from the training data.
 3. It is supervised learning algorithm.
-4. Default method is Euclidean distance (shortest distance between 2 points, using formula  = $\sqrt((X_1-X_2)^2+(Y_1-Y_2)^2)$ ) .
+4. Default method is Euclidean distance (shortest distance between 2 points, using formula  = $\sqrt((X_1-X_2)^2+(Y_1-Y_2)^2)$ ) used for continuous variables whereas for discrete variables, such as for text classification the overlap metric(Hamming distance) would be employed.
 
 ####Requirements for kNN
 1. **Generally k gets decided on the square root of data points**.But a large k value has benefits which include reducing the variance due to the noisy data; the side effect being developing a bias due to which the learner tends to ignore the smaller patterns which may have useful insights
@@ -29,13 +43,14 @@ k nearest neighbors is a simple algorithm that stores all available cases and cl
 
 **Pros**: The algorithm is highly unbiased in nature and makes no prior assumption of the underlying data. Being simple and effective in nature, it is easy to implement and has gained good popularity.
 
-**Cons**: Indeed it is simple but kNN algorithm has drawn a lot of flake for being extremely simple! If we take a deeper look, this doesn't create a model since there's no abstraction process involved. Yes, the training process is really fast as the data is stored verbatim (hence lazy learner) but the prediction time is pretty high with useful insights missing at times. Therefore, building this algorithm requires time to be invested in data preparation (especially treating the missing data and categorical features) to obtain a robust model.
+**Cons**: Indeed it is simple but kNN algorithm has drawn a lot of flake for being extremely simple! If we take a deeper look, this doesn't create a model since there's no abstraction process involved. Yes, the training process is really fast as the data is stored verbatim (hence lazy learner) but the prediction time is pretty high with useful insights missing at times. Therefore, building this algorithm requires time to be invested in data preparation (especially treating the missing data and categorical features) to obtain a robust model. This model is sensitive to outliers too.
 
 
 #### Steps Involved in performing kNN algorithm:
 1. Data Collection.
 2. Preparing and exploring the data.
       * Understnding data structure.
+      * Feature selection (if required)
       * Data normalization.
       * Creating Training and Test data set.
 3. Training a model on data.
@@ -43,100 +58,143 @@ k nearest neighbors is a simple algorithm that stores all available cases and cl
 5. Improve the performance of model.
 
 
-### Case Study on kNN algorithm
+### *Case Study on kNN algorithm*
 
 ##### **Case Study -1**
 
-```{r eval=FALSE}
-getwd()
-gc <- read.csv("germancredit.csv")
-head (gc)
+#### **Objective of Analysis**: *Minimization of risk and maximization of profit on behalf of the bank.*
+Brief Description: To minimize loss from the bank's perspective, the bank needs a decision rule regarding who to give approval of the loan and who not to. An applicant's demographic and socio-economic profiles are considered by loan managers before a decision is taken regarding his/her loan application.
+The German Credit Data contains data on 20 variables and the classification whether an applicant is considered a Good or a Bad credit risk for 1000 loan applicants. Here is a link (https://onlinecourses.science.psu.edu/stat857/sites/onlinecourses.science.psu.edu.stat857/files/german_credit.csv) to the German Credit data. A predictive model developed on this data is expected to provide bank manager guidance for making a decision whether to approve a loan to a prospective applicant based on his/her profiles.
+
+*Methodology: kNN classification*
+
+**Step-1 Data Collection.**
+
+```{r }
+gc <- read.csv("german_credit.csv") # reading csv data files from defined directory as file has already downloaded and sotred in the directory
+
 ## Taking back-up of the input file, in case the original data is required later
-
 gc.bkup <- gc
-
-## Convert the dependent var to factor. Normalize the numeric variables  
-
-gc$Default <- factor(gc$Default)
-
-num.vars <- sapply(gc, is.numeric)
-gc[num.vars] <- lapply(gc[num.vars], scale)
-
-## Selecting only 3 numeric variables for this demostration, just to keep things simple
-
-myvars <- c("duration", "amount", "installment")
-gc.subset <- gc[myvars]
-
-summary(gc.subset)
-
-## Let's predict on a test set of 100 observations. Rest to be used as train set.
+head (gc) # To check top 6 values of all the variables in data set.
 ```
 
+**Step-2 Preparing and exploring the data.**
+Dataset variable details are available on this link (https://archive.ics.uci.edu/ml/datasets/Statlog+%28German+Credit+Data%29 )
 
-```{r eval=FALSE}
-set.seed(123) 
-test <- 1:100
-train.gc <- gc.subset[-test,]
-test.gc <- gc.subset[test,]
+There are 20 attributes/features, so for the simplicity we will select relevant attributes which are as follows :
 
-train.def <- gc$Default[-test]
-test.def <- gc$Default[test]
-## Let's use k values (no of NNs) as 1, 5 and 20 to see how they perform in terms of correct proportion of classification and success rate. The optimum k value can be chosen based on the outcomes as below...
+1. Age (numeric)
+2. Sex (text: male, female)
+3. Job (numeric: 0 - unskilled and non-resident, 1 - unskilled and resident, 2 - skilled, 3 - highly skilled)
+4. Saving accounts (text - little, moderate, quite rich, rich)
+5. Credit amount (numeric, in DM)
+6. Duration (numeric, in month)
+7. Purpose (text: car, furniture/equipment, radio/TV, domestic appliances, repairs, education, business, vacation/others)
 
-library(class)
+*Note: All the attributes' value are already converted to numeric and same data is available on the link as mentioned above.*
 
-knn.1 <-  knn(train.gc, test.gc, train.def, k=1)
-knn.5 <-  knn(train.gc, test.gc, train.def, k=5)
-knn.20 <- knn(train.gc, test.gc, train.def, k=20)
+```{r }
+str(gc) # understanding data structure, can see all the varaibles are integers including 'Creditability' which is our response variable.
 
-## Let's calculate the proportion of correct classification for k = 1, 5 & 20 
+#Feature selection
 
-100 * sum(test.def == knn.1)/100  # For knn = 1
+gc.subset <- gc[c('Creditability','Age..years.','Sex...Marital.Status','Occupation','Account.Balance','Credit.Amount','Length.of.current.employment','Purpose')]
+head(gc.subset)
+
+#The variable 'Creditability' is our target variable i.e. this variable will determine whether bank manager will approve a loan based on the 7 numeric variables
+
+#Data normalistion to avoid biasness as the value sclae of 'Credit.Amount'is in thousand whereas other attribute's value are in 2 digits or 1 digit.
+
+normalize <- function(x) {
+return ((x - min(x)) / (max(x) - min(x))) } # creating a normalize function for easy convertion.
+
+gc.subset.n<- as.data.frame(lapply(gc.subset[2:8], normalize)) # lapply creates list that is why it is converted to dataframe and it applies defined fundtion (which is 'normalize') to all the list values which is here column 2 to 8 as first column is response.
+head(gc.subset.n)
 
 
-100 * sum(test.def == knn.5)/100  # For knn = 5
+#Now all attributes having value in the range 0 to 1 which is normalised data and 'Creditability' column has been removed as sample value starts form column 2.
 
-100 * sum(test.def == knn.20)/100 # For knn = 20
+#Creating Training and Test data set. Training data will be used to build model whereas test data will be used for validation and optimisation of model by tuning k value.
 
-## If we look at the above proportions, it's quite evident that K = 1 correctly classifies 68% of the outcomes, K = 5 correctly classifies 74% and K = 20 does it for 81% of the outcomes. 
+set.seed(123)  # To get the same random sample
+dat.d <- sample(1:nrow(gc.subset.n),size=nrow(gc.subset.n)*0.7,replace = FALSE) #random selection of 70% data.
 
+train.gc <- gc.subset[dat.d,] # 70% training data
+test.gc <- gc.subset[-dat.d,] # remaining 30% test data
+
+#Now creating seperate dataframe for 'Creditability' feature which is our target.
+train.gc_labels <- gc.subset[dat.d,1]
+test.gc_labels  <- gc.subset[-dat.d,1]   
+```
+
+**Step-3 Training a model on data.**
+
+```{r}
+#install.packages(class) # to install class packages as it carries kNN function
+library(class)          # to call class package
+
+NROW(train.gc_labels)   # to find the number of observation
+#To identify optimum value of k, generally square root of total no of observations (700) which is 26.45 is taken, so will try with 26, 27 then will check for optimal value of k.
+
+knn.26 <-  knn(train=train.gc, test=test.gc, cl=train.gc_labels, k=26)
+knn.27 <-  knn(train=train.gc, test=test.gc, cl=train.gc_labels, k=27)
+
+```
+
+**Step-4 Evaluate the model performance.**
+
+```{r}
+
+## Let's calculate the proportion of correct classification for k = 26, 27 
+
+ACC.26 <- 100 * sum(test.gc_labels == knn.26)/NROW(test.gc_labels)  # For knn = 26
+ACC.27 <- 100 * sum(test.gc_labels == knn.27)/NROW(test.gc_labels)  # For knn = 27
+ACC.26
+ACC.27
 ## We should also look at the success rate against the value of increasing K.
 
-table(knn.1 ,test.def)
+table(knn.26 ,test.gc_labels)
+table(knn.26 ,test.gc_labels)
 
-## For K = 1, among 65 customers, 54 or 83%, is success rate. Let's look at k = 5 now
+```
+**OR Accuracy can be calculated using 'caret' package and 'confusion matrix' function.** 
 
-table(knn.5 ,test.def)
+**Install.packages(caret)**, *To install 'caret' packages as it carries 'confusion matrix' function  which helps in the calculation of accuracy of model.*
+```{r include=FALSE}
 
-## For K = 5, among 76 customers, 63 or 82%, is success rate.Let's look at K = 20 now
+library(caret)
+```
+```{r evaluate=FALSE}
 
-table(knn.20 ,test.def)
+library(caret)
 
-##For K = 20, among 88 customers, 71 or 80%, is success rate.
+```
+```{r}
+confusionMatrix(knn.26 ,test.gc_labels)
 
-## It seems increasing K increases the classification but reduces success rate. It is worse to class a customer as good when it is bad, than it is to class a customer as bad when it is good. 
-## By looking at above success rates, K = 1 or K = 5 can be taken as optimum K.
-## We can make a plot of the data with the training set in hollow shapes and the new ones filled in. 
-## Plot for K = 1 can be created as follows - 
+confusionMatrix(knn.27 ,test.gc_labels)
 
-plot(train.gc[,c("amount","duration")],
-     col=c(4,3,6,2)[gc.bkup[-test, "installment"]],
-     pch=c(1,2)[as.numeric(train.def)],
-     main="Predicted Default, by 1 Nearest Neighbors",cex.main=.95)
-
-points(test.gc[,c("amount","duration")],
-       bg=c(4,3,6,2)[gc.bkup[-test,"installment"]],
-       pch=c(21,24)[as.numeric(knn.1)],cex=1.2,col=grey(.7))
-
-legend("bottomright",pch=c(1,16,2,17),bg=c(1,1,1,1),
-       legend=c("data 0","pred 0","data 1","pred 1"),
-       title="default",bty="n",cex=.8)
-
-legend("topleft",fill=c(4,3,6,2),legend=c(1,2,3,4),
-       title="installment %", horiz=TRUE,bty="n",col=grey(.7),cex=.8)
-
-## Plots are good way to represent data visually, but here it looks like an overkill as there are too many data on the plot.
 ```
 
+**Step-5 Improve the performance of model.**
 
+* *For kNN algorithm, the tuning parameters are 'k' value and number of 'features/attributes selection.*
+* *Optimum 'k' value can be found using 'elbow' or 'maximum % accuracy' graph but 'feature selection' can be done only through understanding of features in kNN algorithm.*
 
+```{r }
+i=1                          # declaration to initiate for loop
+k.optm=1                     # declaration to initiate for loop
+for (i in 1:28){ 
+    knn.mod <-  knn(train=train.gc, test=test.gc, cl=train.gc_labels, k=i)
+    k.optm[i] <- 100 * sum(test.gc_labels == knn.mod)/NROW(test.gc_labels)
+    k=i  
+    cat(k,'=',k.optm[i],'\n')                                  # to print % accuracy 
+                  }
+plot(k.optm, type="b", xlab="K- Value",ylab="Accuracy level")  # to plot % accuracy wrt to k-value
+```
+
+#####  **At k=25, maximum accuracy achieved which is 68%, after that, it seems increasing K increases the classification but reduces success rate. It is worse to class a customer as good when it is bad, than it is to class a customer as bad when it is good.** 
+
+#####  *Further accuracy can be increased by optimising feature selections and repeating the above mentioned algorithm.* 
+ 
+--------------------------------------------------------------------------------------------

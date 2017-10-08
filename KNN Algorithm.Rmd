@@ -16,11 +16,11 @@ k nearest neighbors is a simple algorithm that stores all available cases and cl
 
 Let's take a simple case to understand this algorithm. Following is a spread of red circles (RC) and green squares (GS) :
 
-! (/E:/Personl/DATA SCIENTIST/Practice/Cousera_KS/Machine-Learning-Algroithm-Tutorial/knn0.png)
+![image](knn0.png)
 
 You intend to find out the class of the blue star (BS) . BS can either be RC or GS and nothing else. The "K" is KNN algorithm is the nearest neighbors we wish to take vote from. Let's say K = 3. Hence, we will now make a circle with BS as center just as big as to enclose only three datapoints on the plane. Refer to following diagram for more details:
 
-Image
+![image](knn1.png)
 
 The three closest points to BS is all RC. Hence, with good confidence level we can say that the BS should belong to the class RC. Here, the choice became very obvious as all three votes from the closest neighbor went to RC. The choice of the parameter K is very crucial in this algorithm. Next we will understand what are the factors to be considered to conclude the best K.
 

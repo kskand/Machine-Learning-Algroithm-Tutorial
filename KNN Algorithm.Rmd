@@ -1,5 +1,5 @@
 ---
-title : "kNN(k-Nearest Neighbour) Algorithm"
+title : "kNN(k-Nearest Neighbour) Algorithm in R"
 author: "Kumar Skand"
 date  : "October 8, 2017"
 output:
@@ -14,7 +14,7 @@ k nearest neighbors is a simple algorithm that stores all available cases and cl
 
 ###How does the KNN algorithm work?
 
-Let's take a simple case to understand this algorithm. Following is a spread of blue circles (BC) and red rectangel (RR) :
+Let's take a simple case to understand this algorithm. Following is a spread of blue circles (BC) and red rectangle (RR) :
 
 ![](knn2.png)
 
@@ -22,7 +22,7 @@ You intend to find out the class of the green star (GS) . GS can either be BC or
 
 ![](knn3.png)
 
-The three closest points to GS is all BC. Hence, with good confidence level we can say that the GS should belong to the class BC. Here, the choice became very obvious as all three votes from the closest neighbor went to BC. The choice of the parameter K is very crucial in this algorithm. Next we will understand what are the factors to be considered to conclude the best K.
+The three closest points to GS is all BC. Hence, with good confidence level we can say that the GS should belong to the class BC. Here, the choice became very obvious as all four votes from the closest neighbor went to BC. The choice of the parameter K is very crucial in this algorithm. Next we will understand what are the factors to be considered to conclude the best K.
 
 
 ####kNN Algorithm features:
@@ -32,11 +32,11 @@ The three closest points to GS is all BC. Hence, with good confidence level we c
 
 2. It is a lazy learner because it doesn't learn much from the training data.
 3. It is supervised learning algorithm.
-4. Default method is Euclidean distance (shortest distance between 2 points, using formula  = $\sqrt((X_1-X_2)^2+(Y_1-Y_2)^2)$ ) used for continuous variables whereas for discrete variables, such as for text classification the overlap metric(Hamming distance) would be employed.
+4. Default method is Euclidean distance (shortest distance between 2 points, using formula  = $\sqrt((X_1-X_2)^2+(Y_1-Y_2)^2)$ ) used for continuous variables, whereas for discrete variables, such as for text classification the overlap metric(Hamming distance) would be employed.
 
 ####Requirements for kNN
-1. **Generally k gets decided on the square root of data points**.But a large k value has benefits which include reducing the variance due to the noisy data; the side effect being developing a bias due to which the learner tends to ignore the smaller patterns which may have useful insights
-2. **Data Normalization** - It is to transform all the feature data in the same scale (for eg: 0 to 1) else it will give more weitage to the data which is higher in value irrespective of scale/unit.
+1. **Generally k gets decided on the square root of number of data points**.But a large k value has benefits which include reducing the variance due to the noisy data; the side effect being developing a bias due to which the learner tends to ignore the smaller patterns which may have useful insights
+2. **Data Normalization** - It is to transform all the feature data in the same scale (for eg: 0 to 1) else it will give more weightage to the data which is higher in value irrespective of scale/unit.
 3. Installation of "Class" library to implement in R.
 
 ####kNN Algorithm - Pros and Cons
@@ -63,7 +63,7 @@ The three closest points to GS is all BC. Hence, with good confidence level we c
 ##### **Case Study -1**
 
 #### **Objective of Analysis**: *Minimization of risk and maximization of profit on behalf of the bank.*
-Brief Description: To minimize loss from the bank's perspective, the bank needs a decision rule regarding who to give approval of the loan and who not to. An applicant's demographic and socio-economic profiles are considered by loan managers before a decision is taken regarding his/her loan application.
+**Brief Description:** To minimize loss from the bank's perspective, the bank needs a decision rule regarding who to give approval of the loan and who not to. An applicant's demographic and socio-economic profiles are considered by loan managers before a decision is taken regarding his/her loan application.
 The German Credit Data contains data on 20 variables and the classification whether an applicant is considered a Good or a Bad credit risk for 1000 loan applicants. Here is a link (https://onlinecourses.science.psu.edu/stat857/sites/onlinecourses.science.psu.edu.stat857/files/german_credit.csv) to the German Credit data. A predictive model developed on this data is expected to provide bank manager guidance for making a decision whether to approve a loan to a prospective applicant based on his/her profiles.
 
 *Methodology: kNN classification*
@@ -71,7 +71,7 @@ The German Credit Data contains data on 20 variables and the classification whet
 **Step-1 Data Collection.**
 
 ```{r }
-gc <- read.csv("german_credit.csv") # reading csv data files from defined directory as file has already downloaded and sotred in the directory
+gc <- read.csv("german_credit.csv") # reading csv data files from defined directory as file has already downloaded and stored in the directory
 
 ## Taking back-up of the input file, in case the original data is required later
 gc.bkup <- gc
@@ -96,19 +96,20 @@ There are 20 attributes/features, so for the simplicity we will select relevant 
 ```{r }
 str(gc) # understanding data structure, can see all the varaibles are integers including 'Creditability' which is our response variable.
 
-#Feature selection
+#Feature/Attribute selection
+
+#The variable 'Creditability' is our target variable i.e. this variable will determine whether bank manager will approve a loan based on the 7 Attributes.
 
 gc.subset <- gc[c('Creditability','Age..years.','Sex...Marital.Status','Occupation','Account.Balance','Credit.Amount','Length.of.current.employment','Purpose')]
 head(gc.subset)
 
-#The variable 'Creditability' is our target variable i.e. this variable will determine whether bank manager will approve a loan based on the 7 numeric variables
 
 #Data normalistion to avoid biasness as the value sclae of 'Credit.Amount'is in thousand whereas other attribute's value are in 2 digits or 1 digit.
 
 normalize <- function(x) {
 return ((x - min(x)) / (max(x) - min(x))) } # creating a normalize function for easy convertion.
 
-gc.subset.n<- as.data.frame(lapply(gc.subset[2:8], normalize)) # lapply creates list that is why it is converted to dataframe and it applies defined fundtion (which is 'normalize') to all the list values which is here column 2 to 8 as first column is response.
+gc.subset.n<- as.data.frame(lapply(gc.subset[,2:8], normalize)) # lapply creates list that is why it is converted to dataframe and it applies defined fundtion (which is 'normalize') to all the list values which is here column 2 to 8 as first column is target/response.
 head(gc.subset.n)
 
 
@@ -149,15 +150,15 @@ knn.27 <-  knn(train=train.gc, test=test.gc, cl=train.gc_labels, k=27)
 
 ACC.26 <- 100 * sum(test.gc_labels == knn.26)/NROW(test.gc_labels)  # For knn = 26
 ACC.27 <- 100 * sum(test.gc_labels == knn.27)/NROW(test.gc_labels)  # For knn = 27
-ACC.26
-ACC.27
-## We should also look at the success rate against the value of increasing K.
+ACC.26    #Accuracy is 67.67%
+ACC.27    #Accuracy is 67.33%, which has reduced compare to k=26
 
-table(knn.26 ,test.gc_labels)
-table(knn.26 ,test.gc_labels)
-
+table(knn.26 ,test.gc_labels)  # to check prediction against actual value in tabular form
+# 11 & 192 are the correct prediction against actual wheras 90 & 7 are wrong prediction against actual.
+table(knn.27 ,test.gc_labels)  # to check prediction against actual value in tabular form
+# 11 & 191 are the correct prediction against actual wheras 90 & 8 are wrong prediction against actual.
 ```
-**OR Accuracy can be calculated using 'caret' package and 'confusion matrix' function.** 
+**OR Accuracy can also be calculated using 'caret' package and 'confusion matrix' function.** 
 
 **Install.packages(caret)**, *To install 'caret' packages as it carries 'confusion matrix' function  which helps in the calculation of accuracy of model.*
 ```{r include=FALSE}
@@ -188,8 +189,10 @@ for (i in 1:28){
     knn.mod <-  knn(train=train.gc, test=test.gc, cl=train.gc_labels, k=i)
     k.optm[i] <- 100 * sum(test.gc_labels == knn.mod)/NROW(test.gc_labels)
     k=i  
-    cat(k,'=',k.optm[i],'\n')                                  # to print % accuracy 
-                  }
+    cat(k,'=',k.optm[i],'\n')       # to print % accuracy 
+}
+# Maximum accuracy at k=25   
+
 plot(k.optm, type="b", xlab="K- Value",ylab="Accuracy level")  # to plot % accuracy wrt to k-value
 ```
 

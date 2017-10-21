@@ -1,0 +1,272 @@
+---
+title: "Visualisation using plot & ggplot2 in R - PART-1"
+author: "Kumar Skand"
+date: "October 17, 2017"
+output: html_document
+---
+
+
+####'ggplot2' provides two ways to produce plot objects: 
+
+    * qplot(): quick plot - uses some concepts of The Grammar of Graphics, but doesn't provide full capability and designed to be very similar to plot() and simple to use and make it easy to produce basic graphs but may delay understanding philosophy of ggplot2  
+    
+    * ggplot(): grammar of graphics plot - provides fuller implementation of The Grammar of Graphics may have steeper learning curve but allows much more flexibility when building graphs.
+
+####Grammar Defines Components of Graphics
+
+   1) data:  in ggplot2, data must be stored as a R data frame 
+   2) aesthetics: describe visual characteristics that represent data - x-axis, y-axis, position, size, labels, alpha, color, shape, transparency, fill, line width, line type 
+   3) geoms: describe type of geometric objects that represent data - for example, points, lines, histogram, bar, boxplot, polygons, ...  
+   4) facets: describe how data is split into subsets and displayed as multiple small graphs - columns, rows
+   5) stats: describe statistical transformations that typically summarize data(Statistics are used to summarize observations before turning the summaries into geometric objects). - for example, binning, smoothing, inferential,descriptive (counts, means, medians, regression lines, ...  
+   6) coordinate system: describes 2-D space that data is projected onto - for example, Cartesian coordinates, fixed, polar coordinates, limits, map projections, ...  
+   7) Themes/scales: for each aesthetic, describe how visual characteristic is converted to display values - for example, log scales, color scales, size scales, shape scales,  ...  
+   
+* **Note:** * where ever required convert data to factor for better visulisation factorwise.     
+
+```{r mtcars}
+#Lets take 'mtcars' data set for visualisation which is an inbuilt dataset in R.
+str(mtcars) #to understand different variables in the dataset
+```
+
+###*1) Creating a Scatter Plot *
+
+```{r}
+#using normal 'plot' function which is there in R by default.
+plot(mtcars$wt, mtcars$mpg,type='p') # for plot, need to provide 'x' value, 'y' value and 'type' of plot, here 'p' stands for point.
+points(mtcars$wt, mtcars$mpg/2, col='red') # addition of another scatter plot using 'points' function but it works in addition to 'plot' function only, without plot it will give error
+
+```
+
+####Using 'qplot' & 'ggplot function which needs to be loaded by installing 'ggplot2' packages and loading the same.
+
+```{r}
+library(ggplot2) # loading/calling of 'ggplot2' function
+
+qplot(mtcars$wt, mtcars$mpg) # 'qplot' is very similar to plot but graph is similar to 'ggplot'
+
+ggplot(mtcars, aes(x=wt, y=mpg)) + geom_point() # in ggplot, first we need to declare the data (which is mtcars), then we need to declare variable as 'x' & 'y' under 'aes', then we need to add the layer of 'geom', here 'geom_point' stands for point graph.
+
+ggplot(mtcars, aes(x=wt, y=mpg)) + geom_jitter() # in place of 'geom_point', 'geom_jitter' can also be used to plot scatterplot
+
+g1 <- ggplot(mtcars, aes(x=wt, y=mpg)) + geom_point(aes(colour = factor(cyl), shape = factor(vs)))+labs(title = "Fuel economy declines as weight increases",   # Graph title
+    x = "Weight (1000 lbs)",     # x label
+    y = "Fuel economy (mpg)",    # y label
+    colour = "carb",             # legend colour is based on carb 
+    shape = "gear")              # shape of legend is based on gear
+# 'labs' function is used to add label and 'aes' added under 'geom_point' to add colour and shape to the plot.
+g1
+
+g1+theme(legend.position = c(.95, .95), # it defines the postion in terms of % and max value would be 1, and it places the legend as per % distance from x & y axis.
+  legend.justification = c("right", "top"),  # after defining legend position, it justifies the position within the margin, here it's right and top (like in excel within a cell)
+  legend.box.just = c("right",'bottom'), #position of the legend within the legend box, here it's right & bottom
+  legend.margin = margin(6,6,6,6)) # it to give size of the legend box
+
+```
+
+###*2) Creating a Line Graph *
+
+```{r }
+#Using 'pressure' dataframe available in R by default. 
+#using 'plot' function which is there in R by default.
+# here we are plotting four graphs but base graph is 'plot' only other three are addition to the plot
+
+plot(pressure$temperature, pressure$pressure, type="l",col="blue", xlab="Weight (1000 lbs)",ylab = "Fuel economy (mpg)") # type 'line' using colour blue and addition of labels
+
+points(pressure$temperature, pressure$pressure/4, col="green")
+
+lines(pressure$temperature, pressure$pressure/3, col="red") 
+
+points(pressure$temperature, pressure$pressure/2, col="yellow",type = 'b') # here inspite of being 'points' but 'type' = 'b' which is both point & line so graph converted to both.
+
+```
+
+####Using 'qplot' & 'ggplot function.
+
+```{r}
+
+qplot(pressure$temperature, pressure$pressure, geom=c('point',"line"),col='red') # here 'qplot' is mix of plot & ggplot but graph is similar to 'ggplot'
+
+ggplot(pressure, aes(x=temperature, y=pressure)) + geom_line(col='blue')+geom_point(col='green')+geom_text(aes(label=pressure), size=2,vjust=0,hjust=0) # in ggplot, we need to add the layer of 'geom', here 'geom_line' stands for line graph and 'geom_point' stands for point graph. Also 'col' function has been added under different 'geom' layer. Here 'geom_text' is used to add data labels in the graph and positioning can be done using 'vjust' & 'hjust' wheras 'size' will adjust the label size.
+
+
+```
+
+###*3) Creating a Bar Graph  *
+
+```{r }
+#Using 'BOD' dataframe available in R by default. 
+#using 'barplot' function which is there in R by default.
+# here we are plotting four graphs but base graph is 'plot' only other three are addition to the plot
+str(BOD)
+
+barplot(BOD$demand,  names.arg=BOD$Time, col="blue") # here type is already with plot so no seperate type required
+
+points(BOD$demand, col="green")
+
+lines(BOD$demand/4, col="red") 
+
+points(BOD$demand/2, col="yellow",type = 'b') # here inspite of being 'points' but 'type' = 'b' which is both point & line so graph converted to both.
+
+#Sometimes "bar graph" refers to a graph where the bars represent the count of cases in each category. This is similar to a histogram, but with a discrete instead of continuous x-axis. To generate the count of each unique value in a vector, use the table() function:
+table(mtcars$cyl)
+#There are 11 cases of the value 4, 7 cases of 6, and 14 cases of 8 Simply pass the table to barplot() to generate the graph of counts:
+barplot(table(mtcars$cyl)) 
+```
+
+####Using 'qplot' & 'ggplot function.
+```{r}
+
+qplot(BOD$Time, BOD$demand, geom="col") # here geom='col' for bar graph also 'bar' can be used in place of 'col' depends on the data and the way we want to represent, here by default stat="identity"( it leaves the data as is), and for 'bar', by default stat='count'(it counts the number of cases at each x position)
+
+ggplot(BOD, aes(x=Time, y=demand)) + geom_col(stat="identity",fill='purple',col='red') # in ggplot, we need to add the layer of 'geom', here 'geom_col' stands for column/bar graph and also 'fill' function has been added under 'geom_col' function to fill the colour.
+
+# Bar graph of counts 
+qplot(factor(mtcars$cyl)) 
+# This is equivalent to: 
+ggplot(mtcars, aes(x=factor(cyl))) + geom_bar()
+
+ggplot(mtcars, aes(x=factor(cyl),fill = factor(am))) + geom_bar(position = "dodge") # This is an exaample of unstacked graph by mentioning 'postion =dodge'.
+
+ggplot(mtcars, aes(x=factor(cyl),fill = factor(am))) + geom_bar(position = "stack") # This is an exaample of stacked graph by mentioning 'postion =stack' (by default bar graph is stacked no need to mention 'position=stack'). 
+
+ggplot(mtcars, aes(x=factor(cyl),fill = factor(am))) + geom_bar(position='fill')# Now stacking done with respect to postion, all the graphs are at same postion with scale 1 (by default bar graph is stacked).
+
+ggplot(mtcars, aes(x=factor(cyl)))+geom_bar(aes(fill = factor(am)),position = position_stack(reverse = TRUE)) # Stacking done in reverse order that is why 'reverse=TRUE'
+
+ggplot(mtcars, aes(x=factor(cyl)))+geom_bar(aes(fill = factor(am)),position = position_stack(reverse = TRUE))+ coord_flip() # chnaging the coordinate axis using 'coord_flip()'
+
+ggplot(mtcars, aes(x=factor(cyl)))+geom_bar(aes(fill = factor(am)),position = position_stack(reverse = TRUE))+ coord_flip()+ theme(legend.position = "top",plot.background=element_rect(fill = "green"),axis.line = element_line(size = 3, colour = "black")) # changing the postion of legend and highlighting axis with desired colour.
+
+```
+
+###*4) Creating a Histogram Graph  *
+```{r}
+#Normally, 'hist' function can be used to plot histogram.
+hist(mtcars$mpg)
+
+# Specify approximate number of bins with breaks 
+hist(mtcars$mpg, breaks=10) #the bins are narrower, there are fewer items in each bin.
+
+```
+
+####Using 'qplot' & 'ggplot function.
+```{r}
+qplot(mtcars$mpg)  # use of basic 'qplot' function with by default value. 
+#If the vector is in a data frame, you can use the following syntax:
+
+qplot(mpg, data=mtcars, binwidth=4, col='red') # This is equivalent to: 
+
+ggplot(mtcars, aes(x=mpg)) + geom_histogram(binwidth=4,col='red')#'binwidth' decide the class intervals of the data, here 'mpg' got distributed in the intervals of 4. 
+```
+
+
+###*5) Creating a BOX Plot Graph  *
+
+Using the inbuilt dataset 'diamonds' for boxplot
+
+```{r}
+#Normally, 'boxplot' function can be used to plot boxplot.
+boxplot(price~cut, data=diamonds)  # here tilde'~' used to refer the y and x axis relation so to plot boxplot.
+
+# Boxplot of MPG by Car Cylinders
+boxplot(mpg~cyl,data=mtcars, main="Car Milage Data",
+   xlab="Number of Cylinders", ylab="Miles Per Gallon") 
+
+#In built dataset used 'ToothGrowth'
+# Notched Boxplot of Tooth Growth Against 2 Crossed Factors
+# boxes colored for ease of interpretation
+boxplot(len~supp+dose, data=ToothGrowth, notch=TRUE, col=(c("gold","darkgreen")),main="Tooth Growth", xlab="Suppliment and Dose") # shape of boxplot changed by making 'notch=TRUE' and also 2 box plot drawn for the comparison.
+
+```
+
+####Using 'qplot' & 'ggplot function.
+```{r}
+qplot(diamonds$cut, diamonds$price, geom='boxplot')
+
+ggplot(diamonds, aes(cut, price)) +
+  geom_boxplot(outlier.color = 'seagreen',outlier.shape = 16,outlier.size = 5)
+#outlier.color: Please specify the color you want to use for your outliner. Type colors() in your console to get the list of colors available in R programming
+#outlier.shape: Please specify the shape you want to use for outlier.
+#outlier.size: Specify the size of the outlier.
+
+ggplot(diamonds, aes(cut, price)) +
+  geom_boxplot(fill='gold',col='darkgreen',alpha=0.5) + coord_flip()  # axis change using 'coord_flip()' function and coloured. Here 'alpha' gives transparency of filled colour so the colour will fade.
+
+# Notched Boxplot of Tooth Growth Against 2 Crossed Factors
+# boxes colored for ease of interpretation
+ggplot(ToothGrowth, aes(x=as.factor(dose),y=len,fill=supp))+facet_wrap(~supp,scale='free')+geom_boxplot(notch = FALSE)+stat_summary(fun.y = "mean", geom = "point", shape = 8, size = 2, color = "white") 
+#here 'dose' is a continuous data which needs to be converted to factor data for having boxplot dose wise.
+# 'facet_wrap' will plot graph independently by (~x), here x is 'supp' and if we want independent scale for each plot, add 'scale' as free.
+#'stat_summary' is used to add any additional information in terms of statistics, here we have added 'mean' as white colour point.
+```
+
+
+###*6) Creating a Pie Chart Graph  *
+
+Using random data for piechart
+```{r}
+#Normally, 'pie' function can be used to plot pie chart.
+x <- c(21, 62, 10, 53) # some random data as 'x'
+labels <- c("London", "New York", "Singapore", "Mumbai")  # some random labels
+
+pie(x, labels=labels, main="City pie chart", col=rainbow(length(x))) #here 'col' has been chosen as rainbow with length of colour = x
+pie(x, labels=paste(x,sep=", ",labels), main="City pie chart", col=rainbow(length(x)),init.angle = 90,clockwise = TRUE,radius = 1 )# by default initial angle is 0 and anticlockwise, we can change it by using 'init.angle'. We can increase/decrease the size of chart by adding 'radius' function parameter.
+
+```
+
+####Using 'ggplot function.
+```{r}
+#There is no dedicated 'geom' fo pie chart in ggplot2 but it can be drawn using 'geombar' and 'coord_polar'
+
+ggplot(mtcars, aes(x="",y=factor(cyl),fill=cyl)) + geom_bar(width = 1,stat = 'identity')+coord_polar(theta = 'y')+labs(x="",y="",title="% contribution cylinder wise")
+```
+
+###*7) Creating a Area Chart Graph  *
+
+```{r}
+#install.packages(gcookbook)
+library(gcookbook) # For the data set 
+ggplot(uspopage, aes(x=Year, y=Thousands, fill=AgeGroup)) + geom_area()
+
+```
+
+
+
+### Some examples of graphs:
+
+
+ 
+```{r}
+#install.packages(gcookbook)
+library(gcookbook) # For the data set 
+tophit <- tophitters2001[1:25, ] # Take the top 25 from the tophitters data set
+#The tophitters2001 data set contains many columns, but we'll focus on just three of them for this example:
+tophit[, c("name", "lg", "avg")]
+
+# 1) 
+ggplot(tophit, aes(x=avg,y=reorder(name,avg)))+geom_point(size=3)+theme_bw()+  theme(panel.grid.major.x = element_blank(),panel.grid.minor.x = element_blank(), panel.grid.major.y = element_line(colour="grey60", linetype="dashed"))
+
+#'reorder of name by average', 'theme_bw' is to change the background colour white,'panel.grid.major.x' is used to remove vertical lines
+
+# 2)  
+ggplot(mtcars, aes(x=wt, y=mpg)) + geom_point()+geom_smooth()
+
+# 3)
+ggplot(data=mtcars,aes(x=wt, y=mpg, size=cyl,fill=cyl))+ geom_jitter(position= position_jitter(w=.2, h=.1),shape=21) + scale_size_area(max_size=10) 
+```
+
+ ***Shape Reference***
+
+![](gg.shape0.png)
+
+Link for reference : 
+
+ 1) [For Theme](http://ggplot2.tidyverse.org/reference/theme.html)
+ 
+ 2) (http://t-redactyl.io/blog/2016/04/creating-plots-in-r-using-ggplot2-part-10-boxplots.html)
+ 
+ 3) [For BOX Plot_1](https://www.tutorialgateway.org/r-ggplot2-boxplot/) [For BOX Plot_2](http://t-redactyl.io/blog/2016/04/creating-plots-in-r-using-ggplot2-part-10-boxplots.html)
+ 
+ 
+-------------------------------------------------------------------------------

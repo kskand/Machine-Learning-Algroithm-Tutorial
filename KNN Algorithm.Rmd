@@ -1,8 +1,9 @@
 ---
-title : "kNN(k-Nearest Neighbour) Algorithm in R"
+title: "kNN(k-Nearest Neighbour) Algorithm in R"
 author: "Kumar Skand"
-date  : "October 8, 2017"
+date: "October 8, 2017"
 output:
+  word_document: default
   html_document: default
 ---
 ######*References:Various study material available online.*
